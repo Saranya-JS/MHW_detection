@@ -49,7 +49,14 @@ def season_oliver(s,L=365,no_harmonics=3)
 def select_seg_(i,len_1,len_0):
       """
        This function is adopted from Hobday et al. (2016)
+       input 
+       i         :   (Temperature >= Threshold)*1
+       len_1     :   5
+       len_0     :   2
        
+       Return 
+       ind1      :   where Temperature > Threshold
+       ind2      :   where Temperature < Threshold
        """
    
     ind1 = []
@@ -90,6 +97,15 @@ def select_seg_(i,len_1,len_0):
 
 
 def mhw_param(df,ind1,ind2):
+"""""
+        input 
+        df     :   Dataframe of temperature anomaly
+        ind1   :
+        ind2   :
+        Return
+        mhw_df :  Dataframe with MHW statistics
+"""""  
+      
     mhw_mean= []
     mhw_max= []
     mhw_cum= []
@@ -128,4 +144,3 @@ def mhw_param(df,ind1,ind2):
     mhw_df = pd. concat([sd1,ed1,md1,nod,mean1,max1,cum1],axis=1,ignore_index=1)
     mhw_df.columns = ['start_date','end_date','Max_date','No of days','mean_intensity','max_intensity','cumulative_intensity']
     return mhw_df
-
