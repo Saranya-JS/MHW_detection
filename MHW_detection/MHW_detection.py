@@ -144,3 +144,39 @@ def mhw_param(df,ind1,ind2):
     mhw_df = pd. concat([sd1,ed1,md1,nod,mean1,max1,cum1],axis=1,ignore_index=1)
     mhw_df.columns = ['start_date','end_date','Max_date','No of days','mean_intensity','max_intensity','cumulative_intensity']
     return mhw_df
+
+
+
+
+
+
+
+
+def MHW_Area_calculation(df,DS,l):
+"""""
+  This function give us the area of MHW during the peak dates
+        input 
+        df     :   Dataframe of temperature, anomaly, threshold and climatology with MHW peak dates
+        DS     :   Dataset of the region with latitude,longitude and temperature 
+        l      :   list of MHW peak dates
+        Return
+        MHW_area_df:  Dataframe of MHW area
+"""""  
+
+
+    no_grid = np.zeros((len(df)))
+
+    for i in range(len(df)):
+
+            threshold = df.iloc[i,0]
+            time = df.iloc[i].name
+            temp = DS.sst.sel(time=time)
+            grid= np.where((temp> threshold))[0]
+            no_grid[i] = len(grid)
+    grid = pd.DataFrame(no_grid, columns=['no_grid'])
+    MHW_area_df = grid.set_index([l]) 
+    MHW_area_df["resolution"] = "756.25"  #0.25 degree resolution
+    MHW_area_df["area"] = ""
+    MHW_area_df["area"] = MHW_area_df.no_grid * MHW_area_df.resolution.astype(float)
+
+    return MHW_area_df
