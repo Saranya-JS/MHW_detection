@@ -152,31 +152,31 @@ def mhw_param(df,ind1,ind2):
 
 
 
-def MHW_Area_calculation(df,DS,l):
+def MHW_Area_calculation(x,x1,y,y1,mhw_df,anom_ds):
 """""
   This function give us the area of MHW during the peak dates
         input 
-        df     :   Dataframe of temperature, anomaly, threshold and climatology with MHW peak dates
-        DS     :   Dataset of the region with latitude,longitude and temperature 
-        l      :   list of MHW peak dates
+        mhw_df :   Dataframe with MHW statistics
+        DS     :   SST anomaly Dataset with latitude,longitude and temperature anomaly during MHW days
+        x,x1   :   Longitude extend
+        y,y1   :   Latitude extend
+        
         Return
-        MHW_area_df:  Dataframe of MHW area
+        mhw_df :   Dataframe of MHW statistics with area during peak_date
 """""  
 
 
-    no_grid = np.zeros((len(df)))
+  
 
-    for i in range(len(df)):
 
-            threshold = df.iloc[i,0]
-            time = df.iloc[i].name
-            temp = DS.sst.sel(time=time)
-            grid= np.where((temp> threshold))[0]
+    no_grid = np.zeros((len(mhw_df)))
+
+    for i in range(len(mhw_df)):
+            time = mhw_df.iloc[i].Max_date
+            temp = anom_ds.sstanom.sel(time=time, lon=slice(x, x1),lat=slice(y,y1))
+            grid= np.where((temp> 0))[0]
             no_grid[i] = len(grid)
-    grid = pd.DataFrame(no_grid, columns=['no_grid'])
-    MHW_area_df = grid.set_index([l]) 
-    MHW_area_df["resolution"] = "756.25"  #0.25 degree resolution
-    MHW_area_df["area"] = ""
-    MHW_area_df["area"] = MHW_area_df.no_grid * MHW_area_df.resolution.astype(float)
-
-    return MHW_area_df
+    area = pd.DataFrame(no_grid*756.25, columns=['area'])
+    mhw_df = pd. concat([mhw_df,area],axis=1,ignore_index=1)
+    mhw_df.columns = ['start_date','end_date','Max_date','No of days','mean_intensity','max_intensity','cumulative_intensity','Area[peak_date]']
+    return mhw_df
